@@ -1,35 +1,27 @@
 import speech_recognition as sr
 
+audio_count = 0 # used to keep track of the number of audio files stored
 
-r = sr.Recognizer()
-with sr.Microphone() as source:
-    print("Say something!")
-    audio = r.listen(source)
-    
-try:
-    print("Sphinx thinks you said " + r.recognize_sphinx(audio))
-except sr.UnknownValueError:
-    print("Sphinx could not understand audio")
-except sr.RequestError as e:
-    print("Sphinx error; {0}".format(e))
-    
-    # recognize speech using Google Speech Recognition
-try:
-    # for testing purposes, we're just using the default API key
-    # to use another API key, use `r.recognize_google(audio, key="GOOGLE_SPEECH_RECOGNITION_API_KEY")`
-    # instead of `r.recognize_google(audio)`
-    print("Google Speech Recognition thinks you said " + r.recognize_google(audio))
-except sr.UnknownValueError:
-    print("Google Speech Recognition could not understand audio")
-except sr.RequestError as e:
-    print("Could not request results from Google Speech Recognition service; {0}".format(e))
-    
+def recognize_speech():
+    r = sr.Recognizer()
+    with sr.Microphone() as source:
+        print("Say something!")
+        audio = r.listen(source)
+        save_audio(audio)
+        
+    # recognize speech using Microsoft Bing Voice Recognition
+    BING_KEY = ""  # Microsoft Bing Voice Recognition API keys 32-character lowercase hexadecimal strings
+    try:
+        print("Microsoft Bing Voice Recognition thinks you said " + r.recognize_bing(audio, key=BING_KEY))
+    except sr.UnknownValueError:
+        print("Microsoft Bing Voice Recognition could not understand audio")
+    except sr.RequestError as e:
+        print("Could not request results from Microsoft Bing Voice Recognition service; {0}".format(e))    
 
-# recognize speech using Microsoft Bing Voice Recognition
-BING_KEY = "474158a66c384965b039e414cbb00b66"  # Microsoft Bing Voice Recognition API keys 32-character lowercase hexadecimal strings
-try:
-    print("Microsoft Bing Voice Recognition thinks you said " + r.recognize_bing(audio, key=BING_KEY))
-except sr.UnknownValueError:
-    print("Microsoft Bing Voice Recognition could not understand audio")
-except sr.RequestError as e:
-    print("Could not request results from Microsoft Bing Voice Recognition service; {0}".format(e))
+# saves a given audio file in WAV format
+def save_audio(audio):
+    with open("microphone-results" + str(audio_count) + ".wav", "wb") as f:
+        f.write(audio.get_wav_data())
+    audio_count += 1
+
+recognize_speech()
